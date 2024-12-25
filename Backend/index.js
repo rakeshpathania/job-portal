@@ -6,7 +6,7 @@ import cors from "cors";
 import {createServer} from "http";
 import { connectToDb } from './db/connection.js';
 import { userRouter } from './routes/user.routes.js';
-
+import { captainRouter } from './routes/captain.routes.js';
 connectToDb();
 const app = express();
 
@@ -27,6 +27,7 @@ app.use(express.urlencoded({extended: true}));
 //routes
 
 app.use('/api/v1/user',userRouter);
+app.use('/api/v1/captain', captainRouter);
 
 server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
