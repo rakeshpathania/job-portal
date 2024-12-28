@@ -1,5 +1,8 @@
-import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom";
+import { UserDataContext } from "../context/UserContext.jsx";
+import axios from "axios";
 
 const UserSignup = () => {
   const [firstName, setFirstName] = useState("");
@@ -7,30 +10,45 @@ const UserSignup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [userData, setUserData] = useState({});
-
-  const handleSignup = (e) => {
+  const { user, setUser } = useContext(UserDataContext);
+  const navigate = useNavigate();
+  const handleSignup = async (e) => {
     e.preventDefault();
-    const userData = {
+    const newUserData = {
       fullName: {
         firstName: firstName,
-        lastName: lastName
+        lastName: lastName,
       },
       email: email,
       password: password,
-      phoneNumber: phoneNumber
+      phoneNumber: phoneNumber,
     };
-    setUserData(userData);
-    setFirstName("");
-    setLastName("");
-    setEmail("");
-    setPassword("");
-    setPhoneNumber("");
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/api/v1/user/register`,
+        newUserData
+      );
+      if (response.status === 201) {
+        const data = response.data;
+        setUser(data?.user);
+        const { password, ...userWithoutPassword } = data?.user;
+        localStorage.setItem("user", JSON.stringify(userWithoutPassword));
+        localStorage.setItem("token", data?.token);
+        navigate("/home");
+        setFirstName("");
+        setLastName("");
+        setEmail("");
+        setPassword("");
+        setPhoneNumber("");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
-    console.log(userData);
-  }, [userData]);
+    console.log(user);
+  }, [user]);
 
   return (
     <div>
